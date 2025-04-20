@@ -44,14 +44,17 @@ export const getStatusLabel = (room) => {
 };
 
 const generateMockRoomData = () => {
-  const buildings = ['B1', 'B2', 'B5'];
-  const floors = [1, 2, 3, 4, 5];
-  const roomsPerFloor = 10;
+  const buildingConfig = {
+    'B1': { floors: 4, roomsPerFloor: 19 },
+    'B2': { floors: 5, roomsPerFloor: 15 },
+    'B5': { floors: 5, roomsPerFloor: 15 }
+  };
+  
   const allRooms = {};
 
-  buildings.forEach(building => {
-    floors.forEach(floor => {
-      for (let room = 1; room <= roomsPerFloor; room++) {
+  Object.entries(buildingConfig).forEach(([building, config]) => {
+    for (let floor = 1; floor <= config.floors; floor++) {
+      for (let room = 1; room <= config.roomsPerFloor; room++) {
         const roomNumber = `${room}`.padStart(2, '0');
         const roomId = `${building}-${floor}${roomNumber}`;
         
@@ -106,7 +109,7 @@ const generateMockRoomData = () => {
           }] : []
         };
       }
-    });
+    }
   });
 
   return allRooms;

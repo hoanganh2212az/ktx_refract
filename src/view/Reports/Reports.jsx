@@ -14,7 +14,7 @@ export const Reports = () => {
     {
       id: 1,
       title: "Thanh toán & Hoá đơn",
-      path: "/",
+      path: "/billnpayment",
       active: false,
     },
     {

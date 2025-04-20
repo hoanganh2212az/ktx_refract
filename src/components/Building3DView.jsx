@@ -1,103 +1,10 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Text } from '@react-three/drei';
-import { STATUS_COLORS } from '../data/mockRoomData';
-import * as THREE from 'three';
+import { OrbitControls } from '@react-three/drei';
 import Tooltip from './Tooltip';
-
-const GenderIcon = ({ position, gender }) => {
-  const color = gender === 'male' ? '#3b82f6' : '#ec4899';
-  return (
-    <Text
-      position={position}
-      fontSize={0.4}
-      color={color}
-      anchorX="center"
-      anchorY="middle"
-    >
-      {gender === 'male' ? '♂' : '♀'}
-    </Text>
-  );
-};
-
-GenderIcon.propTypes = {
-  position: PropTypes.arrayOf(PropTypes.number).isRequired,
-  gender: PropTypes.oneOf(['male', 'female']).isRequired
-};
-
-const Building = ({ position, buildingData, onRoomHover, onRoomClick, hoveredRoom, buildingName }) => {
-  const floorHeight = 2;
-  const roomWidth = 1;
-  const roomDepth = 3;
-  const buildingWidth = roomWidth * 10; // 10 rooms per floor
-
-  return (
-    <group position={position}>
-      {/* Building structure */}
-      {Object.values(buildingData).map((room) => {
-        const x = (parseInt(room.roomNumber) - 1) * roomWidth - buildingWidth / 2;
-        const y = (room.floor - 1) * floorHeight;
-        const color = STATUS_COLORS[room.status];
-        const isHovered = hoveredRoom?.id === room.id;
-        
-        // Get room leader's gender
-        const leader = room.occupants.find(o => o.isLeader);
-        const roomGender = leader?.gender;
-
-        return (
-          <group key={room.id}>
-            <mesh
-              position={[x, y, 0]}
-              onClick={(e) => {
-                e.stopPropagation();
-                onRoomClick(room);
-              }}
-              onPointerOver={(e) => {
-                e.stopPropagation();
-                onRoomHover(room);
-              }}
-              onPointerOut={() => onRoomHover(null)}
-            >
-              <boxGeometry args={[roomWidth * 0.9, floorHeight * 0.9, roomDepth]} />
-              <meshStandardMaterial 
-                color={color}
-                opacity={isHovered ? 0.8 : 1}
-                transparent
-              />
-            </mesh>
-            {roomGender && (
-              <GenderIcon
-                position={[x, y, roomDepth * 0.5]}
-                gender={roomGender}
-              />
-            )}
-          </group>
-        );
-      })}
-
-      {/* Building Label */}
-      <Text
-        position={[0, -2, 0]}
-        fontSize={1.5}
-        color="#a40000"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {buildingName}
-      </Text>
-    </group>
-  );
-};
-
-Building.propTypes = {
-  position: PropTypes.arrayOf(PropTypes.number).isRequired,
-  buildingData: PropTypes.object.isRequired,
-  onRoomHover: PropTypes.func.isRequired,
-  onRoomClick: PropTypes.func.isRequired,
-  hoveredRoom: PropTypes.object,
-  buildingName: PropTypes.string.isRequired
-};
+import BuildingB1 from './BuildingB1';
+import BuildingB2B5 from './BuildingB2B5';
 
 const Building3DView = ({ rooms, onRoomSelect }) => {
   const [hoveredRoom, setHoveredRoom] = useState(null);
@@ -113,36 +20,67 @@ const Building3DView = ({ rooms, onRoomSelect }) => {
   return (
     <div ref={containerRef} className="w-full h-full relative">
       <Canvas
-        camera={{ position: [20, 10, 20], fov: 60 }}
+        camera={{ position: [30, 30, 30], fov: 60 }}
         style={{ background: '#f5f5f5' }}
       >
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} />
+        {/* Ambient light for overall scene illumination */}
+        <ambientLight intensity={0.7} />
         
-        <Building
-          position={[-12, 0, 0]}
-          buildingData={buildingRooms.B1}
-          onRoomHover={setHoveredRoom}
-          onRoomClick={onRoomSelect}
-          hoveredRoom={hoveredRoom}
-          buildingName="Khu B1"
+        {/* Main directional light (like sunlight) */}
+        <directionalLight 
+          position={[10, 20, 10]} 
+          intensity={0.8}
+          castShadow
         />
-        <Building
-          position={[0, 0, 0]}
-          buildingData={buildingRooms.B2}
-          onRoomHover={setHoveredRoom}
-          onRoomClick={onRoomSelect}
-          hoveredRoom={hoveredRoom}
-          buildingName="Khu B2"
+        
+        {/* Additional point lights for better building details */}
+        <pointLight 
+          position={[0, 15, 0]} 
+          intensity={0.5}
+          color="#ffffff"
         />
-        <Building
-          position={[12, 0, 0]}
-          buildingData={buildingRooms.B5}
-          onRoomHover={setHoveredRoom}
-          onRoomClick={onRoomSelect}
-          hoveredRoom={hoveredRoom}
-          buildingName="Khu B5"
+        <pointLight 
+          position={[-15, 10, -15]} 
+          intensity={0.3}
+          color="#ffe5b4"
         />
+        <pointLight 
+          position={[15, 10, -15]} 
+          intensity={0.3}
+          color="#ffe5b4"
+        />
+        
+        <group>
+          <group position={[-11, 0, -17]} rotation={[0, -Math.PI / 2, 0]}>
+            <BuildingB2B5
+              position={[0, 0, 0]}
+              buildingData={buildingRooms.B2}
+              onRoomHover={setHoveredRoom}
+              onRoomClick={onRoomSelect}
+              hoveredRoom={hoveredRoom}
+              buildingName="Khu B2"
+            />
+          </group>
+
+          <BuildingB1
+            position={[0, 0, 0]}
+            buildingData={buildingRooms.B1}
+            onRoomHover={setHoveredRoom}
+            onRoomClick={onRoomSelect}
+            hoveredRoom={hoveredRoom}
+          />
+
+          <group position={[13, 0, -15]} rotation={[0, Math.PI / 2, 0]}>
+            <BuildingB2B5
+              position={[0, 0, 0]}
+              buildingData={buildingRooms.B5}
+              onRoomHover={setHoveredRoom}
+              onRoomClick={onRoomSelect}
+              hoveredRoom={hoveredRoom}
+              buildingName="Khu B5"
+            />
+          </group>
+        </group>
 
         <OrbitControls
           enablePan={true}

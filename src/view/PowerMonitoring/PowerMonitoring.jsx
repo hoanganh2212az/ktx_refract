@@ -20,7 +20,7 @@ export const PowerMonitoring = () => {
     {
       id: 1,
       title: "Thanh toán & Hoá đơn",
-      path: "/",
+      path: "/billnpayment",
       active: false,
     },
     {
