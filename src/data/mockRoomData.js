@@ -1,17 +1,13 @@
 export const ROOM_STATUS = {
-  EMPTY: 'EMPTY',
-  OCCUPIED: 'OCCUPIED',
-  PENDING: 'PENDING',
-  MAINTENANCE: 'MAINTENANCE',
-  LOCKED: 'LOCKED'
+  AVAILABLE: 'AVAILABLE',
+  FULL: 'FULL',
+  MAINTENANCE: 'MAINTENANCE'
 };
 
 export const STATUS_COLORS = {
-  [ROOM_STATUS.EMPTY]: '#22c55e',
-  [ROOM_STATUS.OCCUPIED]: '#ef4444',
-  [ROOM_STATUS.PENDING]: '#eab308',
-  [ROOM_STATUS.MAINTENANCE]: '#6b7280',
-  [ROOM_STATUS.LOCKED]: '#1e1e1e'
+  [ROOM_STATUS.AVAILABLE]: '#22c55e',  // Green
+  [ROOM_STATUS.FULL]: '#ef4444',       // Red
+  [ROOM_STATUS.MAINTENANCE]: '#6b7280'  // Gray
 };
 
 const MAX_OCCUPANTS = 8;
@@ -28,16 +24,12 @@ const FEMALE_NAMES = [
 
 export const getStatusLabel = (room) => {
   switch (room.status) {
-    case ROOM_STATUS.OCCUPIED:
-      return room.occupants.length >= MAX_OCCUPANTS ? '8/8' : `${room.occupants.length}/8`;
-    case ROOM_STATUS.EMPTY:
-      return room.occupants.length === 0 ? '0/8' : `${room.occupants.length}/8`;
-    case ROOM_STATUS.PENDING:
-      return 'Chờ duyệt';
+    case ROOM_STATUS.FULL:
+      return '8/8';
+    case ROOM_STATUS.AVAILABLE:
+      return `${room.occupants.length}/8`;
     case ROOM_STATUS.MAINTENANCE:
       return 'Bảo trì';
-    case ROOM_STATUS.LOCKED:
-      return 'Tạm khóa';
     default:
       return 'Không xác định';
   }
@@ -65,9 +57,9 @@ const generateMockRoomData = () => {
         const nameList = isMaleRoom ? MALE_NAMES : FEMALE_NAMES;
         
         const occupants = [];
-        if (randomStatus === ROOM_STATUS.OCCUPIED) {
-          const numOccupants = MAX_OCCUPANTS;
-          for (let i = 0; i < numOccupants; i++) {
+        if (randomStatus === ROOM_STATUS.FULL) {
+          // Fill all 8 spots for full rooms
+          for (let i = 0; i < MAX_OCCUPANTS; i++) {
             occupants.push({
               id: `${roomId}-${i}`,
               name: nameList[i],
@@ -76,7 +68,8 @@ const generateMockRoomData = () => {
               joinDate: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1)
             });
           }
-        } else if (randomStatus === ROOM_STATUS.EMPTY && Math.random() > 0.5) {
+        } else if (randomStatus === ROOM_STATUS.AVAILABLE) {
+          // Random number of occupants between 1 and 7 for available rooms
           const numOccupants = Math.floor(Math.random() * (MAX_OCCUPANTS - 1)) + 1;
           for (let i = 0; i < numOccupants; i++) {
             occupants.push({

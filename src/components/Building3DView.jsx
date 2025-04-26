@@ -4,17 +4,67 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Tooltip from './Tooltip';
 import BuildingB1 from './BuildingB1';
-import BuildingB2B5 from './BuildingB2B5';
+import BuildingB2 from './BuildingB2';
+import BuildingB5 from './BuildingB5';
+
+const CoordinateGizmo = () => {
+  return (
+    <group>
+      {/* X axis - Red */}
+      <mesh position={[2, 0, 0]}>
+        <boxGeometry args={[4, 0.1, 0.1]} />
+        <meshStandardMaterial color="#ff0000" />
+      </mesh>
+      
+      {/* Y axis - Green */}
+      <mesh position={[0, 2, 0]}>
+        <boxGeometry args={[0.1, 4, 0.1]} />
+        <meshStandardMaterial color="#00ff00" />
+      </mesh>
+      
+      {/* Z axis - Blue */}
+      <mesh position={[0, 0, 2]}>
+        <boxGeometry args={[0.1, 0.1, 4]} />
+        <meshStandardMaterial color="#0000ff" />
+      </mesh>
+    </group>
+  );
+};
 
 const Building3DView = ({ rooms, onRoomSelect }) => {
   const [hoveredRoom, setHoveredRoom] = useState(null);
   const containerRef = useRef();
+  const controlsRef = useRef();
 
   // Group rooms by building
   const buildingRooms = {
     B1: Object.values(rooms).filter(room => room.building === 'B1'),
     B2: Object.values(rooms).filter(room => room.building === 'B2'),
     B5: Object.values(rooms).filter(room => room.building === 'B5')
+  };
+
+  const focusOnB1 = () => {
+    if (controlsRef.current) {
+      controlsRef.current.object.position.set(0, 5, 30);
+      controlsRef.current.target.set(0, 5, 0);
+      controlsRef.current.update();
+    }
+  };
+
+  const focusOnB2 = () => {
+    if (controlsRef.current) {
+      controlsRef.current.object.position.set(-30, 5, -17);
+      controlsRef.current.target.set(-11, 5, -17);
+      controlsRef.current.update();
+    }
+  };
+
+  const focusOnB5 = () => {
+    if (controlsRef.current) {
+      controlsRef.current.object.position.set(30, 5, -15);
+      controlsRef.current.target.set(13, 5, -15);
+      controlsRef.current.update();
+    }
   };
 
   return (
@@ -49,16 +99,19 @@ const Building3DView = ({ rooms, onRoomSelect }) => {
           intensity={0.3}
           color="#ffe5b4"
         />
+
+        {/* Coordinate System Gizmo */}
+        <CoordinateGizmo />
         
         <group>
-          <group position={[-11, 0, -17]} rotation={[0, -Math.PI / 2, 0]}>
-            <BuildingB2B5
+          <group position={[-11, 0, -18]} rotation={[0, -Math.PI / 2, 0]}>
+            <BuildingB2
               position={[0, 0, 0]}
               buildingData={buildingRooms.B2}
               onRoomHover={setHoveredRoom}
               onRoomClick={onRoomSelect}
               hoveredRoom={hoveredRoom}
-              buildingName="Khu B2"
+              onBuildingNameClick={focusOnB2}
             />
           </group>
 
@@ -68,25 +121,28 @@ const Building3DView = ({ rooms, onRoomSelect }) => {
             onRoomHover={setHoveredRoom}
             onRoomClick={onRoomSelect}
             hoveredRoom={hoveredRoom}
+            onBuildingNameClick={focusOnB1}
           />
 
-          <group position={[13, 0, -15]} rotation={[0, Math.PI / 2, 0]}>
-            <BuildingB2B5
+          <group position={[13, 0, -17]} rotation={[0, Math.PI / 2, 0]}>
+            <BuildingB5
               position={[0, 0, 0]}
               buildingData={buildingRooms.B5}
               onRoomHover={setHoveredRoom}
               onRoomClick={onRoomSelect}
               hoveredRoom={hoveredRoom}
-              buildingName="Khu B5"
+              onBuildingNameClick={focusOnB5}
             />
           </group>
         </group>
 
         <OrbitControls
+          ref={controlsRef}
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
           target={[0, 5, 0]}
+          maxPolarAngle={Math.PI / 2}
         />
       </Canvas>
 

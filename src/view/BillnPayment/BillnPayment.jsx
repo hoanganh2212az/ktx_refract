@@ -1,5 +1,5 @@
 import { SearchIcon, Download, ChevronDown, Bell } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
@@ -43,35 +43,42 @@ export const BillnPayment = () => {
   ];
 
   // Areas data
-  const areas = ["A", "B1", "B2", "B5"];
+  const areas = ["B1", "B2", "B5"];
 
-  // Floors data
-  const floors = ["Tầng 1", "Tầng 2", "Tầng 3", "Tầng 4", "Tầng 5"];
+  // Dynamic floors based on selected area
+  const floors = useMemo(() => {
+    if (selectedArea === "Khu B1") {
+      return Array.from({ length: 4 }, (_, i) => `Tầng ${i + 1}`);
+    } else if (selectedArea === "Khu B2" || selectedArea === "Khu B5") {
+      return Array.from({ length: 5 }, (_, i) => `Tầng ${i + 1}`);
+    }
+    return [];
+  }, [selectedArea]);
 
   // Room money data - Extended with more rooms
   const roomMoneyData = [
-    { id: 1, name: "Khu A - P.203", amount: 2000000, isPaid: true },
-    { id: 2, name: "Khu A - P.204", amount: 1600000, isPaid: false },
-    { id: 3, name: "Khu A - P.205", amount: 2000000, isPaid: true },
-    { id: 4, name: "Khu A - P.206", amount: 2000000, isPaid: true },
-    { id: 5, name: "Khu A - P.207", amount: 1600000, isPaid: false },
-    { id: 6, name: "Khu A - P.208", amount: 1600000, isPaid: false },
-    { id: 7, name: "Khu A - P.209", amount: 2000000, isPaid: true },
-    { id: 8, name: "Khu A - P.210", amount: 1600000, isPaid: false },
-    { id: 9, name: "Khu A - P.211", amount: 1600000, isPaid: false },
+    { id: 1, name: "Khu B1 - P.203", amount: 2000000, isPaid: true },
+    { id: 2, name: "Khu B1 - P.204", amount: 1600000, isPaid: false },
+    { id: 3, name: "Khu B1 - P.205", amount: 2000000, isPaid: true },
+    { id: 4, name: "Khu B1 - P.206", amount: 2000000, isPaid: true },
+    { id: 5, name: "Khu B2 - P.207", amount: 1600000, isPaid: false },
+    { id: 6, name: "Khu B2 - P.208", amount: 1600000, isPaid: false },
+    { id: 7, name: "Khu B5 - P.209", amount: 2000000, isPaid: true },
+    { id: 8, name: "Khu B5 - P.210", amount: 1600000, isPaid: false },
+    { id: 9, name: "Khu B5 - P.211", amount: 1600000, isPaid: false },
   ];
 
   // Room electrical data - Extended with more rooms
   const roomElectricalData = [
-    { id: 1, name: "Khu A - P.203", amount: 356000, percentChange: 0.5 },
-    { id: 2, name: "Khu A - P.204", amount: 527000, percentChange: -12.0 },
-    { id: 3, name: "Khu A - P.205", amount: 113000, percentChange: 0.2 },
-    { id: 4, name: "Khu A - P.206", amount: 425000, percentChange: 1.5 },
-    { id: 5, name: "Khu A - P.207", amount: 287000, percentChange: -8.0 },
-    { id: 6, name: "Khu A - P.208", amount: 342000, percentChange: 2.3 },
-    { id: 7, name: "Khu A - P.209", amount: 198000, percentChange: -5.1 },
-    { id: 8, name: "Khu A - P.210", amount: 445000, percentChange: 3.7 },
-    { id: 9, name: "Khu A - P.211", amount: 276000, percentChange: -1.8 },
+    { id: 1, name: "Khu B1 - P.203", amount: 356000, percentChange: 0.5 },
+    { id: 2, name: "Khu B1 - P.204", amount: 527000, percentChange: -12.0 },
+    { id: 3, name: "Khu B1 - P.205", amount: 113000, percentChange: 0.2 },
+    { id: 4, name: "Khu B2 - P.206", amount: 425000, percentChange: 1.5 },
+    { id: 5, name: "Khu B2 - P.207", amount: 287000, percentChange: -8.0 },
+    { id: 6, name: "Khu B2 - P.208", amount: 342000, percentChange: 2.3 },
+    { id: 7, name: "Khu B5 - P.209", amount: 198000, percentChange: -5.1 },
+    { id: 8, name: "Khu B5 - P.210", amount: 445000, percentChange: 3.7 },
+    { id: 9, name: "Khu B5 - P.211", amount: 276000, percentChange: -1.8 },
   ];
 
   const displayedMoneyRooms = expandedMoney ? roomMoneyData : roomMoneyData.slice(0, 3);
@@ -145,7 +152,10 @@ export const BillnPayment = () => {
               {areas.map((area) => (
                 <DropdownMenuItem
                   key={area}
-                  onClick={() => setSelectedArea(`Khu ${area}`)}
+                  onClick={() => {
+                    setSelectedArea(`Khu ${area}`);
+                    setSelectedFloor("Tầng");
+                  }}
                 >
                   Khu {area}
                 </DropdownMenuItem>
@@ -157,6 +167,7 @@ export const BillnPayment = () => {
               <Button
                 variant="outline"
                 className="px-6 py-3 bg-[#a40000] text-white border-none rounded-xl flex items-center gap-2 hover:bg-[#8a0000]"
+                disabled={selectedArea === "Khu"}
               >
                 {selectedFloor}
                 <ChevronDown className="w-5 h-5" />

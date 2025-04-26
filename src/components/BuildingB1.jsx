@@ -4,7 +4,7 @@ import { createRoom } from './Room';
 import DoubleWinderStaircase from './DoubleWinderStaircase';
 import Roof from './Roof';
 
-const BuildingB1 = ({ position, buildingData, onRoomHover, onRoomClick, hoveredRoom }) => {
+const BuildingB1 = ({ position, buildingData, onRoomHover, onRoomClick, hoveredRoom, onBuildingNameClick }) => {
   const floorHeight = 2;
   const roomWidth = 1.5;
   const roomDepth = 3;
@@ -41,27 +41,54 @@ const BuildingB1 = ({ position, buildingData, onRoomHover, onRoomClick, hoveredR
           <group key={floor}>
             {rooms.map((room) => {
               let x = 0, z = 0;
+              let rotation = [0, 0, 0];
               const roomIndex = parseInt(room.roomNumber);
+              const spacing = 0.2; // Consistent spacing between rooms
+              const zOffset = 1; // Additional Z offset for wing rooms
+              const xOffset = 2; // X offset for wing rooms
               
+              // Calculate new room number based on position
+              let newRoomNumber;
               if (roomIndex <= 15) {
+                // Front rooms
                 let xOffset = 0;
                 if (roomIndex >= 8) {
-                  xOffset = 1 * (roomWidth + 0.2);
+                  xOffset = 1 * (roomWidth + spacing);
                 }
                 if (roomIndex >= 16) {
-                  xOffset = 2 * (roomWidth + 0.2);
+                  xOffset = 2 * (roomWidth + spacing);
                 }
-                x = (roomIndex - 8) * (roomWidth + 0.2) + xOffset;
+                x = (roomIndex - 8) * (roomWidth + spacing) + xOffset;
                 z = 0;
+
+                // Assign odd numbers to left side, even numbers to right side
+                if (x < 0) {
+                  // Left side (odd numbers)
+                  newRoomNumber = Math.abs(Math.round(x / (roomWidth + spacing))) * 2 + 1;
+                } else {
+                  // Right side (even numbers)
+                  newRoomNumber = Math.round(x / (roomWidth + spacing)) * 2 + 2;
+                }
               } else if (roomIndex <= 17) {
-                x = 8 * (roomWidth + 0.2);
-                z = (roomIndex - 15) * (roomDepth + 0.2);
+                // Right wing
+                x = (8 * (roomWidth + spacing)) + xOffset;
+                z = ((roomIndex - 15) * (roomWidth + spacing)) + zOffset;
+                rotation = [0, -Math.PI / 2, 0];
+                newRoomNumber = 16 + (roomIndex - 15) * 2;
               } else {
-                x = -7 * (roomWidth + 0.2);
-                z = (roomIndex - 17) * (roomDepth + 0.2);
+                // Left wing
+                x = (-7 * (roomWidth + spacing)) - xOffset;
+                z = ((roomIndex - 17) * (roomWidth + spacing)) + zOffset;
+                rotation = [0, Math.PI / 2, 0];
+                newRoomNumber = 15 + (roomIndex - 17) * 2;
               }
+
+              // Update room.id with new room number
+              const [building, roomFull] = room.id.split('-');
+              const newRoomId = `${building}-${roomFull[0]}${newRoomNumber.toString().padStart(2, '0')}`;
+              room.id = newRoomId;
               
-              return createRoom(room, x, floorY, z, roomOptions);
+              return createRoom(room, x, floorY, z, {...roomOptions, rotation});
             })}
             
             <DoubleWinderStaircase 
@@ -79,6 +106,7 @@ const BuildingB1 = ({ position, buildingData, onRoomHover, onRoomClick, hoveredR
         position={[1, maxFloorHeight, 0]}
         buildingName="Khu B1"
         isUShape={true}
+        onBuildingNameClick={onBuildingNameClick}
       />
     </group>
   );
@@ -89,7 +117,8 @@ BuildingB1.propTypes = {
   buildingData: PropTypes.object.isRequired,
   onRoomHover: PropTypes.func.isRequired,
   onRoomClick: PropTypes.func.isRequired,
-  hoveredRoom: PropTypes.object
+  hoveredRoom: PropTypes.object,
+  onBuildingNameClick: PropTypes.func.isRequired
 };
 
 export default BuildingB1;

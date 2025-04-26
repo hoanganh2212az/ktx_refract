@@ -38,6 +38,13 @@ export const createRoom = (room, x, y, z, options) => {
   const isHovered = hoveredRoom?.id === room.id;
   const leader = room.occupants.find(o => o.isLeader);
   const roomGender = leader?.gender;
+  
+  const symbolZ = roomDepth * 0.5 + 0.1;
+  
+  // Extract floor and room number from room.id (e.g., "B1-404")
+  const [, roomFull] = room.id.split('-');
+  const floor = roomFull.charAt(0);
+  const roomNum = roomFull.slice(1);
 
   return (
     <group key={room.id} position={[x, y, z]} rotation={rotation}>
@@ -59,9 +66,19 @@ export const createRoom = (room, x, y, z, options) => {
           transparent
         />
       </mesh>
+      {/* Room Number */}
+      <Text
+        position={[0, 0.7, symbolZ]}
+        fontSize={0.4}
+        color="#ffffff"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {`P.${floor}${roomNum}`}
+      </Text>
       {roomGender && (
         <GenderIcon
-          position={[0, 0, roomDepth * 0.5+0.1]}
+          position={[0, 0, symbolZ]}
           gender={roomGender}
         />
       )}

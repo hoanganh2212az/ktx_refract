@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { SearchIcon, Download, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Avatar } from "../../components/ui/avatar";
@@ -54,22 +54,29 @@ export const PowerMonitoring = () => {
   ];
 
   // Areas data
-  const areas = ["A", "B1", "B2", "B5"];
+  const areas = ["B1", "B2", "B5"];
 
-  // Floors data
-  const floors = ["Tầng 1", "Tầng 2", "Tầng 3", "Tầng 4", "Tầng 5"];
+  // Dynamic floors based on selected area
+  const floors = useMemo(() => {
+    if (selectedArea === "Khu B1") {
+      return Array.from({ length: 4 }, (_, i) => `Tầng ${i + 1}`);
+    } else if (selectedArea === "Khu B2" || selectedArea === "Khu B5") {
+      return Array.from({ length: 5 }, (_, i) => `Tầng ${i + 1}`);
+    }
+    return [];
+  }, [selectedArea]);
 
   // Power usage data
   const powerUsageData = [
-    { id: 1, name: "Khu A - P.203", power: 1000, amount: 356000, percentChange: 0.5 },
-    { id: 2, name: "Khu A - P.204", power: 4000, amount: 527000, percentChange: -12.0 },
-    { id: 3, name: "Khu A - P.205", power: 1200, amount: 527000, percentChange: -12.0 },
-    { id: 4, name: "Khu A - P.206", power: 3000, amount: 356000, percentChange: 0.5 },
-    { id: 5, name: "Khu A - P.207", power: 5600, amount: 527000, percentChange: -12.0 },
-    { id: 6, name: "Khu A - P.208", power: 1200, amount: 527000, percentChange: -12.0 },
-    { id: 7, name: "Khu A - P.209", power: 1000, amount: 356000, percentChange: 0.5 },
-    { id: 8, name: "Khu A - P.210", power: 1200, amount: 527000, percentChange: -12.0 },
-    { id: 9, name: "Khu A - P.211", power: 1200, amount: 527000, percentChange: -12.0 },
+    { id: 1, name: "Khu B1 - P.203", power: 1000, amount: 356000, percentChange: 0.5 },
+    { id: 2, name: "Khu B1 - P.204", power: 4000, amount: 527000, percentChange: -12.0 },
+    { id: 3, name: "Khu B2 - P.205", power: 1200, amount: 527000, percentChange: -12.0 },
+    { id: 4, name: "Khu B2 - P.206", power: 3000, amount: 356000, percentChange: 0.5 },
+    { id: 5, name: "Khu B5 - P.207", power: 5600, amount: 527000, percentChange: -12.0 },
+    { id: 6, name: "Khu B5 - P.208", power: 1200, amount: 527000, percentChange: -12.0 },
+    { id: 7, name: "Khu B5 - P.209", power: 1000, amount: 356000, percentChange: 0.5 },
+    { id: 8, name: "Khu B1 - P.210", power: 1200, amount: 527000, percentChange: -12.0 },
+    { id: 9, name: "Khu B2 - P.211", power: 1200, amount: 527000, percentChange: -12.0 },
   ];
 
   return (
@@ -140,7 +147,10 @@ export const PowerMonitoring = () => {
               {areas.map((area) => (
                 <DropdownMenuItem
                   key={area}
-                  onClick={() => setSelectedArea(`Khu ${area}`)}
+                  onClick={() => {
+                    setSelectedArea(`Khu ${area}`);
+                    setSelectedFloor("Tầng");
+                  }}
                 >
                   Khu {area}
                 </DropdownMenuItem>
@@ -152,6 +162,7 @@ export const PowerMonitoring = () => {
               <Button
                 variant="outline"
                 className="px-6 py-3 bg-[#a40000] text-white border-none rounded-xl flex items-center gap-2 hover:bg-[#8a0000]"
+                disabled={selectedArea === "Khu"}
               >
                 {selectedFloor}
                 <ChevronDown className="w-5 h-5" />
