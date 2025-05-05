@@ -111,7 +111,7 @@ export const BillnPayment = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-8 overflow-y-auto">
+      <div className="flex-1 p-8">
         <h1 className="text-[#a40000] text-3xl font-semibold mb-8">
           THANH TOÁN & HOÁ ĐƠN
         </h1>
@@ -199,7 +199,7 @@ export const BillnPayment = () => {
               </Button>
             </div>
             <div 
-              className="grid grid-cols-3 gap-6 relative transition-all duration-500 ease-in-out origin-top transform"
+              className="grid grid-cols-3 gap-6 transition-all duration-500 ease-in-out origin-top transform"
               style={{
                 maxHeight: expandedMoney ? `${Math.ceil(roomMoneyData.length / 3) * 180}px` : '180px',
                 overflow: 'hidden',
@@ -210,24 +210,18 @@ export const BillnPayment = () => {
               {displayedMoneyRooms.map((room, index) => (
                 <div 
                   key={room.id} 
-                  className="relative transition-all duration-500 ease-in-out"
-                  style={{
-                    opacity: 1,
-                    transform: `translateY(0)`,
-                    transitionDelay: `${index * 50}ms`
-                  }}
+                  className="relative"
                 >
-                  <RoomMoney
-                    room={room}
-                    onClick={() => setSelectedMoneyRoom(room)}
-                  />
-                  {selectedMoneyRoom?.id === room.id && (
-                    <div className="absolute top-0 left-0 w-full z-10">
-                      <BigRoomMoney
-                        room={room}
-                        onClose={() => setSelectedMoneyRoom(null)}
-                      />
-                    </div>
+                  {selectedMoneyRoom?.id === room.id ? (
+                    <BigRoomMoney
+                      room={room}
+                      onClose={() => setSelectedMoneyRoom(null)}
+                    />
+                  ) : (
+                    <RoomMoney
+                      room={room}
+                      onClick={() => setSelectedMoneyRoom(room)}
+                    />
                   )}
                 </div>
               ))}
@@ -249,7 +243,7 @@ export const BillnPayment = () => {
               </Button>
             </div>
             <div 
-              className="grid grid-cols-3 gap-6 relative transition-all duration-500 ease-in-out origin-top transform"
+              className="grid grid-cols-3 gap-6 transition-all duration-500 ease-in-out origin-top transform"
               style={{
                 maxHeight: expandedElectrical ? `${Math.ceil(roomElectricalData.length / 3) * 180}px` : '180px',
                 overflow: 'hidden',
@@ -260,24 +254,18 @@ export const BillnPayment = () => {
               {displayedElectricalRooms.map((room, index) => (
                 <div 
                   key={room.id} 
-                  className="relative transition-all duration-500 ease-in-out"
-                  style={{
-                    opacity: 1,
-                    transform: `translateY(0)`,
-                    transitionDelay: `${index * 50}ms`
-                  }}
+                  className="relative"
                 >
-                  <RoomElectrical
-                    room={room}
-                    onClick={() => setSelectedElectricalRoom(room)}
-                  />
-                  {selectedElectricalRoom?.id === room.id && (
-                    <div className="absolute top-0 left-0 w-full z-10">
-                      <BigRoomElectrical
-                        room={room}
-                        onClose={() => setSelectedElectricalRoom(null)}
-                      />
-                    </div>
+                  {selectedElectricalRoom?.id === room.id ? (
+                    <BigRoomElectrical
+                      room={room}
+                      onClose={() => setSelectedElectricalRoom(null)}
+                    />
+                  ) : (
+                    <RoomElectrical
+                      room={room}
+                      onClick={() => setSelectedElectricalRoom(room)}
+                    />
                   )}
                 </div>
               ))}
