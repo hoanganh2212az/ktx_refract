@@ -8,6 +8,7 @@ import PowerUsageCard from "../../components/PowerUsageCard";
 import BigPowerUsageCard from "../../components/BigPowerUsageCard";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../components/ui/dropdown-menu";
 import { mockRooms } from "../../data/mockRoomData";
+import { filterRooms, transformRoomElectricalData } from "../../utils/searchUtils";
 
 export const PowerMonitoring = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export const PowerMonitoring = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedArea, setSelectedArea] = useState("Khu");
   const [selectedFloor, setSelectedFloor] = useState("Tầng");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Navigation menu items data
   const menuItems = [
@@ -40,18 +42,9 @@ export const PowerMonitoring = () => {
 
   // Months data
   const months = [
-    "Tháng 1",
-    "Tháng 2",
-    "Tháng 3",
-    "Tháng 4",
-    "Tháng 5",
-    "Tháng 6",
-    "Tháng 7",
-    "Tháng 8",
-    "Tháng 9",
-    "Tháng 10",
-    "Tháng 11",
-    "Tháng 12"
+    "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4",
+    "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8",
+    "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
   ];
 
   // Areas data
@@ -67,22 +60,11 @@ export const PowerMonitoring = () => {
     return [];
   }, [selectedArea]);
 
-  // Transform mock data for power usage display
+  // Transform and filter room data
   const powerUsageData = useMemo(() => {
-    return Object.values(mockRooms).map(room => {
-      const currentUsage = room.powerUsage.current;
-      const lastMonthUsage = room.powerUsage.history[0];
-      const percentChange = ((currentUsage - lastMonthUsage) / lastMonthUsage * 100).toFixed(1);
-      
-      return {
-        id: room.id,
-        name: `Khu ${room.building} - P.${room.floor}${room.roomNumber.padStart(2, '0')}`,
-        power: currentUsage,
-        amount: currentUsage * 3500, // Assuming 3500 VND per kWh
-        percentChange: parseFloat(percentChange)
-      };
-    });
-  }, []);
+    const transformedData = transformRoomElectricalData(Object.values(mockRooms));
+    return filterRooms(transformedData, searchQuery, selectedArea, selectedFloor);
+  }, [searchQuery, selectedArea, selectedFloor]);
 
   return (
     <div className="flex min-h-screen bg-[#F5F5F5]">
@@ -136,6 +118,8 @@ export const PowerMonitoring = () => {
             <Input
               className="pl-12 py-3 bg-white rounded-xl border-none"
               placeholder="Tìm kiếm phòng"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <DropdownMenu>

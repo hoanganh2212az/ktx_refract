@@ -10,6 +10,7 @@ import BigRoomMoney from "../../components/BigRoomMoney";
 import BigRoomElectrical from "../../components/BigRoomElectrical";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../components/ui/dropdown-menu";
 import { mockRooms } from "../../data/mockRoomData";
+import { filterRooms, transformRoomMoneyData, transformRoomElectricalData } from "../../utils/searchUtils";
 
 export const BillnPayment = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export const BillnPayment = () => {
   const [selectedElectricalRoom, setSelectedElectricalRoom] = useState(null);
   const [selectedArea, setSelectedArea] = useState("Khu");
   const [selectedFloor, setSelectedFloor] = useState("Tầng");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Navigation menu items data
   const menuItems = [
@@ -55,31 +57,16 @@ export const BillnPayment = () => {
     return [];
   }, [selectedArea]);
 
-  // Transform mock data for room money display
+  // Transform and filter room data
   const roomMoneyData = useMemo(() => {
-    return Object.values(mockRooms).map(room => ({
-      id: room.id,
-      name: `Khu ${room.building} - P.${room.floor}${room.roomNumber.padStart(2, '0')}`,
-      amount: room.powerUsage.current * 3500, // Assuming 3500 VND per kWh
-      isPaid: Math.random() > 0.5 // Random payment status for demonstration
-    }));
-  }, []);
+    const transformedData = transformRoomMoneyData(Object.values(mockRooms));
+    return filterRooms(transformedData, searchQuery, selectedArea, selectedFloor);
+  }, [searchQuery, selectedArea, selectedFloor]);
 
-  // Transform mock data for electrical usage display
   const roomElectricalData = useMemo(() => {
-    return Object.values(mockRooms).map(room => {
-      const currentUsage = room.powerUsage.current;
-      const lastMonthUsage = room.powerUsage.history[0];
-      const percentChange = ((currentUsage - lastMonthUsage) / lastMonthUsage * 100).toFixed(1);
-      
-      return {
-        id: room.id,
-        name: `Khu ${room.building} - P.${room.floor}${room.roomNumber.padStart(2, '0')}`,
-        amount: currentUsage * 3500, // Assuming 3500 VND per kWh
-        percentChange: parseFloat(percentChange)
-      };
-    });
-  }, []);
+    const transformedData = transformRoomElectricalData(Object.values(mockRooms));
+    return filterRooms(transformedData, searchQuery, selectedArea, selectedFloor);
+  }, [searchQuery, selectedArea, selectedFloor]);
 
   const displayedMoneyRooms = expandedMoney ? roomMoneyData : roomMoneyData.slice(0, 3);
   const displayedElectricalRooms = expandedElectrical ? roomElectricalData : roomElectricalData.slice(0, 3);
@@ -136,6 +123,8 @@ export const BillnPayment = () => {
             <Input
               className="pl-12 py-3 bg-white rounded-xl border-none"
               placeholder="Tìm kiếm phòng"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <DropdownMenu>
@@ -203,15 +192,31 @@ export const BillnPayment = () => {
               </Button>
               <Button
                 variant="outline"
-                className="bg-[#a40000] text-white border-none rounded-xl hover:bg-[#8a0000]"
+                className="bg-[#a40000] text-white border-none rounded-xl hover:bg-[#8a0000] transition-transform duration-300"
                 onClick={() => setExpandedMoney(!expandedMoney)}
               >
                 {expandedMoney ? 'Thu gọn' : 'Xem thêm'}
               </Button>
             </div>
-            <div className="grid grid-cols-3 gap-6 relative">
-              {displayedMoneyRooms.map((room) => (
-                <div key={room.id} className="relative">
+            <div 
+              className="grid grid-cols-3 gap-6 relative transition-all duration-500 ease-in-out origin-top transform"
+              style={{
+                maxHeight: expandedMoney ? `${Math.ceil(roomMoneyData.length / 3) * 180}px` : '180px',
+                overflow: 'hidden',
+                opacity: 1,
+                transform: `translateY(0)`,
+              }}
+            >
+              {displayedMoneyRooms.map((room, index) => (
+                <div 
+                  key={room.id} 
+                  className="relative transition-all duration-500 ease-in-out"
+                  style={{
+                    opacity: 1,
+                    transform: `translateY(0)`,
+                    transitionDelay: `${index * 50}ms`
+                  }}
+                >
                   <RoomMoney
                     room={room}
                     onClick={() => setSelectedMoneyRoom(room)}
@@ -237,15 +242,31 @@ export const BillnPayment = () => {
               </Button>
               <Button
                 variant="outline"
-                className="bg-[#a40000] text-white border-none rounded-xl hover:bg-[#8a0000]"
+                className="bg-[#a40000] text-white border-none rounded-xl hover:bg-[#8a0000] transition-transform duration-300"
                 onClick={() => setExpandedElectrical(!expandedElectrical)}
               >
                 {expandedElectrical ? 'Thu gọn' : 'Xem thêm'}
               </Button>
             </div>
-            <div className="grid grid-cols-3 gap-6 relative">
-              {displayedElectricalRooms.map((room) => (
-                <div key={room.id} className="relative">
+            <div 
+              className="grid grid-cols-3 gap-6 relative transition-all duration-500 ease-in-out origin-top transform"
+              style={{
+                maxHeight: expandedElectrical ? `${Math.ceil(roomElectricalData.length / 3) * 180}px` : '180px',
+                overflow: 'hidden',
+                opacity: 1,
+                transform: `translateY(0)`,
+              }}
+            >
+              {displayedElectricalRooms.map((room, index) => (
+                <div 
+                  key={room.id} 
+                  className="relative transition-all duration-500 ease-in-out"
+                  style={{
+                    opacity: 1,
+                    transform: `translateY(0)`,
+                    transitionDelay: `${index * 50}ms`
+                  }}
+                >
                   <RoomElectrical
                     room={room}
                     onClick={() => setSelectedElectricalRoom(room)}
