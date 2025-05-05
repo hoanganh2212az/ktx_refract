@@ -9,7 +9,7 @@ import RoomElectrical from "../../components/RoomElectrical";
 import BigRoomMoney from "../../components/BigRoomMoney";
 import BigRoomElectrical from "../../components/BigRoomElectrical";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../components/ui/dropdown-menu";
-import PropTypes from "prop-types";
+import { mockRooms } from "../../data/mockRoomData";
 
 export const BillnPayment = () => {
   const navigate = useNavigate();
@@ -55,31 +55,31 @@ export const BillnPayment = () => {
     return [];
   }, [selectedArea]);
 
-  // Room money data - Extended with more rooms
-  const roomMoneyData = [
-    { id: 1, name: "Khu B1 - P.203", amount: 2000000, isPaid: true },
-    { id: 2, name: "Khu B1 - P.204", amount: 1600000, isPaid: false },
-    { id: 3, name: "Khu B1 - P.205", amount: 2000000, isPaid: true },
-    { id: 4, name: "Khu B1 - P.206", amount: 2000000, isPaid: true },
-    { id: 5, name: "Khu B2 - P.207", amount: 1600000, isPaid: false },
-    { id: 6, name: "Khu B2 - P.208", amount: 1600000, isPaid: false },
-    { id: 7, name: "Khu B5 - P.209", amount: 2000000, isPaid: true },
-    { id: 8, name: "Khu B5 - P.210", amount: 1600000, isPaid: false },
-    { id: 9, name: "Khu B5 - P.211", amount: 1600000, isPaid: false },
-  ];
+  // Transform mock data for room money display
+  const roomMoneyData = useMemo(() => {
+    return Object.values(mockRooms).map(room => ({
+      id: room.id,
+      name: `Khu ${room.building} - P.${room.floor}${room.roomNumber.padStart(2, '0')}`,
+      amount: room.powerUsage.current * 3500, // Assuming 3500 VND per kWh
+      isPaid: Math.random() > 0.5 // Random payment status for demonstration
+    }));
+  }, []);
 
-  // Room electrical data - Extended with more rooms
-  const roomElectricalData = [
-    { id: 1, name: "Khu B1 - P.203", amount: 356000, percentChange: 0.5 },
-    { id: 2, name: "Khu B1 - P.204", amount: 527000, percentChange: -12.0 },
-    { id: 3, name: "Khu B1 - P.205", amount: 113000, percentChange: 0.2 },
-    { id: 4, name: "Khu B2 - P.206", amount: 425000, percentChange: 1.5 },
-    { id: 5, name: "Khu B2 - P.207", amount: 287000, percentChange: -8.0 },
-    { id: 6, name: "Khu B2 - P.208", amount: 342000, percentChange: 2.3 },
-    { id: 7, name: "Khu B5 - P.209", amount: 198000, percentChange: -5.1 },
-    { id: 8, name: "Khu B5 - P.210", amount: 445000, percentChange: 3.7 },
-    { id: 9, name: "Khu B5 - P.211", amount: 276000, percentChange: -1.8 },
-  ];
+  // Transform mock data for electrical usage display
+  const roomElectricalData = useMemo(() => {
+    return Object.values(mockRooms).map(room => {
+      const currentUsage = room.powerUsage.current;
+      const lastMonthUsage = room.powerUsage.history[0];
+      const percentChange = ((currentUsage - lastMonthUsage) / lastMonthUsage * 100).toFixed(1);
+      
+      return {
+        id: room.id,
+        name: `Khu ${room.building} - P.${room.floor}${room.roomNumber.padStart(2, '0')}`,
+        amount: currentUsage * 3500, // Assuming 3500 VND per kWh
+        percentChange: parseFloat(percentChange)
+      };
+    });
+  }, []);
 
   const displayedMoneyRooms = expandedMoney ? roomMoneyData : roomMoneyData.slice(0, 3);
   const displayedElectricalRooms = expandedElectrical ? roomElectricalData : roomElectricalData.slice(0, 3);
@@ -266,8 +266,4 @@ export const BillnPayment = () => {
       </div>
     </div>
   );
-};
-
-BillnPayment.propTypes = {
-  children: PropTypes.node
 };

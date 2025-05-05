@@ -47,40 +47,31 @@ const BuildingB1 = ({ position, buildingData, onRoomHover, onRoomClick, hoveredR
               const zOffset = 1; // Additional Z offset for wing rooms
               const xOffset = 2; // X offset for wing rooms
               
-              // Calculate new room number based on position
               let newRoomNumber;
               if (roomIndex <= 15) {
-                // Front rooms
-                let xOffset = 0;
-                if (roomIndex >= 8) {
-                  xOffset = 1 * (roomWidth + spacing);
-                }
-                if (roomIndex >= 16) {
-                  xOffset = 2 * (roomWidth + spacing);
-                }
-                x = (roomIndex - 8) * (roomWidth + spacing) + xOffset;
-                z = 0;
-
-                // Assign odd numbers to left side, even numbers to right side
-                if (x < 0) {
-                  // Left side (odd numbers)
-                  newRoomNumber = Math.abs(Math.round(x / (roomWidth + spacing))) * 2 + 1;
+                // Front rooms (1,3,5,7,9,11,13 on left, 2,4,6,8,10,12,14 on right)
+                if (roomIndex <= 7) {
+                  // Left side of staircase
+                  x = -(8 - roomIndex) * (roomWidth + spacing);
+                  newRoomNumber = ((7 - roomIndex) * 2) + 1;
                 } else {
-                  // Right side (even numbers)
-                  newRoomNumber = Math.round(x / (roomWidth + spacing)) * 2 + 2;
+                  // Right side of staircase
+                  x = (roomIndex - 7) * (roomWidth + spacing);
+                  newRoomNumber = (roomIndex - 7) * 2;
                 }
+                z = 0;
               } else if (roomIndex <= 17) {
-                // Right wing
+                // Right wing (18,20)
                 x = (8 * (roomWidth + spacing)) + xOffset;
                 z = ((roomIndex - 15) * (roomWidth + spacing)) + zOffset;
                 rotation = [0, -Math.PI / 2, 0];
-                newRoomNumber = 16 + (roomIndex - 15) * 2;
+                newRoomNumber = roomIndex === 16 ? 18 : 20;
               } else {
-                // Left wing
+                // Left wing (15,17)
                 x = (-7 * (roomWidth + spacing)) - xOffset;
                 z = ((roomIndex - 17) * (roomWidth + spacing)) + zOffset;
                 rotation = [0, Math.PI / 2, 0];
-                newRoomNumber = 15 + (roomIndex - 17) * 2;
+                newRoomNumber = roomIndex === 18 ? 15 : 17;
               }
 
               // Update room.id with new room number
@@ -103,7 +94,7 @@ const BuildingB1 = ({ position, buildingData, onRoomHover, onRoomClick, hoveredR
       <Roof
         width={totalWidth}
         depth={totalDepth}
-        position={[1, maxFloorHeight, 0]}
+        position={[0, maxFloorHeight, 0]}
         buildingName="Khu B1"
         isUShape={true}
         onBuildingNameClick={onBuildingNameClick}

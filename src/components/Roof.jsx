@@ -4,8 +4,8 @@ import { Text } from '@react-three/drei';
 
 const Roof = ({ width, depth, position, buildingName, isUShape, onBuildingNameClick }) => {
   const roofHeight = 1.5;
-  const overhang = 0.5;
-  const roofColor = "#8B4513";
+  const overhang = .5;
+  const roofColor = "#8B4649";
 
   const handleTextClick = (e) => {
     e.stopPropagation();

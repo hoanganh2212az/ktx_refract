@@ -7,6 +7,7 @@ import { Input } from "../../components/ui/input";
 import PowerUsageCard from "../../components/PowerUsageCard";
 import BigPowerUsageCard from "../../components/BigPowerUsageCard";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../components/ui/dropdown-menu";
+import { mockRooms } from "../../data/mockRoomData";
 
 export const PowerMonitoring = () => {
   const navigate = useNavigate();
@@ -66,18 +67,22 @@ export const PowerMonitoring = () => {
     return [];
   }, [selectedArea]);
 
-  // Power usage data
-  const powerUsageData = [
-    { id: 1, name: "Khu B1 - P.203", power: 1000, amount: 356000, percentChange: 0.5 },
-    { id: 2, name: "Khu B1 - P.204", power: 4000, amount: 527000, percentChange: -12.0 },
-    { id: 3, name: "Khu B2 - P.205", power: 1200, amount: 527000, percentChange: -12.0 },
-    { id: 4, name: "Khu B2 - P.206", power: 3000, amount: 356000, percentChange: 0.5 },
-    { id: 5, name: "Khu B5 - P.207", power: 5600, amount: 527000, percentChange: -12.0 },
-    { id: 6, name: "Khu B5 - P.208", power: 1200, amount: 527000, percentChange: -12.0 },
-    { id: 7, name: "Khu B5 - P.209", power: 1000, amount: 356000, percentChange: 0.5 },
-    { id: 8, name: "Khu B1 - P.210", power: 1200, amount: 527000, percentChange: -12.0 },
-    { id: 9, name: "Khu B2 - P.211", power: 1200, amount: 527000, percentChange: -12.0 },
-  ];
+  // Transform mock data for power usage display
+  const powerUsageData = useMemo(() => {
+    return Object.values(mockRooms).map(room => {
+      const currentUsage = room.powerUsage.current;
+      const lastMonthUsage = room.powerUsage.history[0];
+      const percentChange = ((currentUsage - lastMonthUsage) / lastMonthUsage * 100).toFixed(1);
+      
+      return {
+        id: room.id,
+        name: `Khu ${room.building} - P.${room.floor}${room.roomNumber.padStart(2, '0')}`,
+        power: currentUsage,
+        amount: currentUsage * 3500, // Assuming 3500 VND per kWh
+        percentChange: parseFloat(percentChange)
+      };
+    });
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-[#F5F5F5]">

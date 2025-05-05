@@ -73,13 +73,13 @@ const BuildingB5 = ({ position, buildingData, onRoomHover, onRoomClick, hoveredR
               // Calculate new room number based on position relative to staircase
               let newRoomNumber;
               if (roomIndex <= 7) {
-                // Left side of staircase (odd numbers)
+                // Left side of staircase (1,3,5,7,9,11,13)
                 x = -(8 - roomIndex) * (roomWidth + 0.2);
-                newRoomNumber = Math.abs(Math.round(x / (roomWidth + 0.2))) * 2 + 1;
+                newRoomNumber = ((7 - roomIndex) * 2) + 1;
               } else {
-                // Right side of staircase (even numbers)
+                // Right side of staircase (2,4,6,8,10,12,14,16)
                 x = (roomIndex - 7) * (roomWidth + 0.2);
-                newRoomNumber = Math.round(x / (roomWidth + 0.2)) * 2;
+                newRoomNumber = (roomIndex - 7) * 2;
               }
 
               // Update room.id with new room number
@@ -102,7 +102,7 @@ const BuildingB5 = ({ position, buildingData, onRoomHover, onRoomClick, hoveredR
       <Roof
         width={totalWidth + 2}
         depth={totalDepth + 2}
-        position={[1, maxFloorHeight, 0]}
+        position={[0, maxFloorHeight, 0]}
         buildingName="Khu B5"
         onBuildingNameClick={onBuildingNameClick}
       />

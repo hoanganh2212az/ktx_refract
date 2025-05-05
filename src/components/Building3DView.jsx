@@ -31,6 +31,15 @@ const CoordinateGizmo = () => {
   );
 };
 
+const GroundPlane = () => {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.1, 0]} receiveShadow>
+      <planeGeometry args={[50, 50]} />
+      <meshStandardMaterial color="#e5e5e5" />
+    </mesh>
+  );
+};
+
 const Building3DView = ({ rooms, onRoomSelect }) => {
   const [hoveredRoom, setHoveredRoom] = useState(null);
   const containerRef = useRef();
@@ -61,8 +70,8 @@ const Building3DView = ({ rooms, onRoomSelect }) => {
 
   const focusOnB5 = () => {
     if (controlsRef.current) {
-      controlsRef.current.object.position.set(30, 5, -15);
-      controlsRef.current.target.set(13, 5, -15);
+      controlsRef.current.object.position.set(35, 5, -17);
+      controlsRef.current.target.set(13, 5, -17);
       controlsRef.current.update();
     }
   };
@@ -72,6 +81,7 @@ const Building3DView = ({ rooms, onRoomSelect }) => {
       <Canvas
         camera={{ position: [30, 30, 30], fov: 60 }}
         style={{ background: '#f5f5f5' }}
+        shadows
       >
         {/* Ambient light for overall scene illumination */}
         <ambientLight intensity={0.7} />
@@ -99,6 +109,9 @@ const Building3DView = ({ rooms, onRoomSelect }) => {
           intensity={0.3}
           color="#ffe5b4"
         />
+
+        {/* Ground Plane */}
+        <GroundPlane />
 
         {/* Coordinate System Gizmo */}
         <CoordinateGizmo />
