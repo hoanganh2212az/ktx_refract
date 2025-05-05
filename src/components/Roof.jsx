@@ -18,20 +18,20 @@ const Roof = ({ width, depth, position, buildingName, isUShape, onBuildingNameCl
     return (
       <group position={position}>
         {/* Left wing */}
-        <mesh position={[-width/3 - width/6, roofHeight/2-0.8, depth-6]}>
-          <boxGeometry args={[width/10 + overhang, roofHeight, depth - 4 + overhang]} />
+        <mesh position={[-width/3 - width/6 - 0.375, roofHeight/2-0.8, depth-6]}>
+          <boxGeometry args={[width/5 + overhang, roofHeight, depth - 4 + overhang]} />
           <meshStandardMaterial color={roofColor} />
         </mesh>
-
+        
         {/* Right wing */}
-        <mesh position={[width/3 + width/6, roofHeight/2-0.8, depth-6]}>
-          <boxGeometry args={[width/10 + overhang, roofHeight, depth - 4 + overhang]} />
+        <mesh position={[width/3 + width/6 + 0.375, roofHeight/2-0.8, depth-6]}>
+          <boxGeometry args={[width/5 + overhang, roofHeight, depth - 4 + overhang]} />
           <meshStandardMaterial color={roofColor} />
         </mesh>
-
+        
         {/* Back connection */}
         <mesh position={[0, roofHeight/2-0.8, 0]}>
-          <boxGeometry args={[width*1.1 + overhang, roofHeight, depth/2 + overhang]} />
+          <boxGeometry args={[width*1.225 + overhang, roofHeight, depth/2 + overhang]} />
           <meshStandardMaterial color={roofColor} />
         </mesh>
 
